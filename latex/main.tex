@@ -236,7 +236,7 @@ Initialize: \(w^{(0)}=(0,...,0)\)
 \end{minipage}
 \end{figure}
 
-\subsection{Chapter 2.4  }
+\subsection{About Derivation}
 \textbf{1. 梯度下降法}
 
 
@@ -411,7 +411,7 @@ $G-Gumbel(m)\quad P(G\le y)=exp(-exp(y+m))$，若G是iid的Gumbel(0)分布，则
 
 ${ x }\in { R }^{ p },\quad x={ ({ x }_{ 1 }{ ,...,x }_{ p }) }^{ T }{ y }$，特征值是离散值，不能用⾼斯分布。则$P(x|y)=\sum _{ j=1 }^{ p }{ P(y)P({ x }_{ j }|y) } $，$\Sigma =diag({ \sigma  }_{ 1 }{ ,...,\sigma  }_{ p })$。
 
-\subsection{Chapter 2.5  Loss Functions Design}
+\subsection{Loss Functions Design}
 
 对一个Discriminant Model，我们看Logistic Regression，考虑输入是$x\in{R^p}$，$y\in{\{0,1\}}$是类标，有如下分布：
 \begin{gather}
@@ -613,7 +613,7 @@ P(y=1|z,w) & =P(y=1|z>0,w)\cdot P(z>0|w)+P(y=1|z<0,w)\cdot P(z<0|w)\\
 \section{Chapter 3  Kernel}
 
 
-\subsection{Chapter 3.1 Motivation}
+\subsection{Motivation}
 
 \begin{wrapfigure}{l}{4.5cm}%靠文字内容的左侧
 \includegraphics[width=4cm]{figs/XOR.png}\\
@@ -665,17 +665,148 @@ exp(\frac { <{ x }_{ 1 },{ x }_{ 2 }> }{ { \sigma  }^{ 2 } } )=\sum _{ k=0 }^{ \
 
 这样高斯核就把二维数据扩展到无限维。
 
-\subsection{Chapter 3.2 }
+\subsection{Neural Network Methods}
 
-
-现在看神经网络的解决方法。神经网络希望通过最简单的方法让X真实地表现出来。任意给定一个两层的神经网络，用ReLU做激活函数，假设输入的四个数据分别为{(1,1),(-1,-1),(-1,1),(1,-1)}，设$h=(X^Tw+b)$，权重为$B=[[1,-1],[-1,1]]$，则
 \begin{wrapfigure}{r}{4.5cm}%靠文字内容的右侧
-\includegraphics[width=3cm]{figs/Nerual Network.png}\\
-\caption{Nerual Network}\label{fig5}
+\includegraphics[width=3cm]{figs/fig5.png}
+\caption{Neural Network}\label{fig5}
 \end{wrapfigure}
 
+现在看神经网络的解决方法。神经网络希望通过最简单的方法让X真实地表现出来。任意给定一个两层的神经网络，用ReLU做激活函数，假设输入的四个数据分别为{(1,1),(-1,-1),(-1,1),(1,-1)}，设$h=(X^Tw+b)$，权重为$B=[[1,-1],[-1,1]]$，则通过一个ReLU的输出为
 
-\subsection{Chapter 3.3 PCA}
+${ RelU }(X\cdot B)={ RelU }\left( \begin{array}{ll} { 0 } & { 0 } \\ { 0 } & { 0 } \\ { -2 } & { 2 } \\ { 2 } & { -2 } \end{array} \right) =\left( \begin{array}{l} { 0\quad 0 } \\ { 0\quad 0 } \\ { 0\quad 2 } \\ { 2\quad 0 } \end{array} \right) $
+
+当再经过一个$(1,1)^T$的滤波，最后输出的结果是$(0,0,2,2)^T$，这样就把四个数据分开了。
+
+\subsection{Underfit VS Overfit \& Bias VS Variance}
+
+1. Underfit VS Overfit
+\\
+
+给定N个数据$\{x_1,...,x_N\}\in R^N$，$b_n\in R$，定义$y_n=f(x_n)_\epsilon_n$是一个预测器，其中$\epsilon_n$是噪音，且$E(\epsilon_n)=0,D(\epsilon_n)=\sigma^2$。预测器未知，通过数据找到一个估计$F(x)$尽可能与$f$接近，且在测试数据上表现良好。
+
+a). F does poorly on training sample with large error $\rightarrow$ Underfitting
+
+b). F does well on training sample but not well on testing sample $\rightarrow$ Overfitting
+
+考虑${ \left\| Xb-y \right\|  }^{ 2 }$，X是一个$N\times P$的矩阵，若$N\gg P$，即数据个数远大于参数个数，容易造成underfit，反之若$N \ll P$，即参数个数远大于数据个数，容易造成overfit.
+\\
+\\2. Bias VS Variance
+\\
+
+$Bias = E(F(x)-f(x))$，若$Bias = 0$则$F(x)$是无偏的；若$Bias \neq 0$，但是当N趋近于无穷大时等于0，则是渐近无偏。
+
+$Variance = E(E(x)-E^2(F(x))) = E(F(x))^2 - (E(F(X))^2)$
+
+【欠拟合】：有偏
+
+【过拟合】：方差很大
+
+\begin{equation}
+\begin{aligned} 
+& \mathbb{E}\left((y-F(x))^{2}\right)\\ =&\left(\mathbb{E}(f(x)-F(x))^{2}+\mathbb{E}\left(\left(F(x)^{2}-\mathbb{E}(F(x))\right)^{2}\right)+\mathbb{E}(y-f(x))^{2}\right)\\
+& \quad\quad\quad bias^2 \quad\quad\quad\quad variance \quad\quad\quad\quad\quad noise^2
+\end{aligned}
+\end{equation}
+
+对于$F_\theta(x)$，$\theta$是未知的参数，利用$\{x_n\}$估计${\hat{\theta}_{N}=g\left(x_{1}, \cdots, x_{N}\right)}$统计量，
+
+\begin{equation}
+\begin{aligned}
+& \text { bias }\left(\hat{\theta}_{N}\right)=\mathbb{E}\left(\hat{\theta}_{N}\right)-\theta \\
+& \operatorname{Var}\left(\hat{\theta}_{N}\right)=\mathbb{E}\left(\hat{\theta}_{N}-E\left(\hat{\theta}_{N}\right)^{2}\right)\\
+\end{aligned}
+\end{equation}
+
+若${x_1,...,x_N}\overset { iid }{ \sim  } bernulii(\theta) \sim \theta^{x}(1-\theta)^{1-x}$:
+
+\begin{equation}
+\hat{\theta}_{N}=\frac{1}{N} \sum_{n=1}^{N} x_{n} \quad E\left(\partial_{N}\right)=\frac{1}{N} \sum_{k=1}^{N} E\left(x_{n}\right)=\theta \text{无偏估计}
+\end{equation}
+
+若${x_1,...,x_N}\overset { iid }{ \sim  } Gaussian(\mu, \sigma^2)$:
+
+\begin{equation}
+\begin{aligned}
+& \hat { \mu  } _{ N }=\frac { 1 }{ N } \sum _{ n=1 }^{ N }{ x_{ n } } \quad E\left( \hat { \mu  } _{ N } \right) =\mu \\
+& \hat{\sigma}_{N}=\frac{1}{N} \sum_{n=1}^{N}\left(\chi_{n}-\hat{\mu}_{N}\right)^{2} \quad E\left(\hat{\sigma}_{N}\right)=\frac{N-1}{N} \sigma^{2} \text{渐近无偏}\\
+& \hat{\sigma}_{N}=\frac{1}{N-1} \sum_{n=1}^{N}\left(x_{n}-\hat{\mu}_{N}\right)^{2} \text{无偏}\\
+\end{aligned}
+\end{equation}
+
+\subsection{PCA}
+
+设X是一个$N\times p$维的数据，定义$\phi(A,Z)=\frac_{1}_{2}tr((X-ZA^T)(X-ZA^T)^T)$，A是$p\times q$维矩阵，其中$q<p$，A是列正交的，即$A^A=I_q$。这时我们称A是投影矩阵，Z是一个低维表示。我们的目标是找到A和Z，然后$\underset {Z,A}{min} \varphi (A,Z)$，也就是最小化${\left\| X-Z{ A }^{ T }\right\|}_{ F }^{ 2 }$，若找到$A_{p\times q}$，有$min(X-XAA^T)$最小即可。
+
+定义Lagrange函数$(A,Z)=\frac { 1 }{ 2 } tr((X-Z{ A }^{ T }){ (X-Z{ A }^{ T }) }^{ T })-\frac { 1 }{ 2 } tr(L({ A }^{ T }A-{ I }_{ q }))$，$A=[a_1,..,a_q]^T$，L是拉格朗日乘子矩阵，是个对称阵，则要找$\frac_{dL}_{dA}=0,\frac_{dL}_{dZ}=0$的解。
+
+\begin{equation}
+\begin{aligned}
+dL & =\frac { 1 }{ 2 } { tr }\left( d\left( XA^{ T } \right) \left( X-ZA^{ T } \right) ^{ T } \right) +\frac { 1 }{ 2 } { tr }\left( X-ZA^{ T } \right) d\left( X-ZA^{ T } \right) ^{ \top  })-\frac { 1 }{ 2 } { tr }\left( L(dA^{ T }A+A^{ T }dA \right) \\ 
+& =...+...-\frac { 1 }{ 2 } (tr(LdA^{ T }A)+tr(LA^{ T }dA))\\
+& =...+...-\frac { 1 }{ 2 } (tr(ALdA^{ T })+tr(dA^{ T }AL))\\ 
+& =...+...-\frac { 1 }{ 2 } (tr(ALdA^{ T })+tr(ALdA^{ T }))\quad \quad (tr(AB)=tr(BA))\\ 
+& ={ tr }\left( (X-ZA^{ T })d{ (X-ZA^{ T }) }^{ T } \right) -tr(ALdA^{ T })\\ 
+& ={ tr }\left( X-ZA^{ T } \right) (AdZ^{ T }+dAZ^{ T })-tr(ALdA^{ T })\\ 
+& =tr(\left( X-ZA^{ T } \right) AdZ^{ T })+tr(X-ZA^{ T })dAZ^{ T })-tr(ALdA^{ T })\\
+& =...+tr(ZdA^{ T }{ \left( X-ZA^{ T } \right)  }^{ T })-...\\ 
+& =...+tr(\left( X-ZA^{ T } \right) ZdA^{ T })-...\\ 
+& =-tr((X-ZA^{ T })A(dZ^{ T }))-tr((X^{ T }Z-AZ^{ T }Z+AL)dA^{ T })\\
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\left\{\begin{array}{l}{\frac{d L}{d Z}=-\left(X-2 A^{T}\right) A=0} \\ 
+{\frac{d L}{d A}=-\left(X^{T} Z-A Z^{T} Z+A L\right)=0} \\ 
+{A^{T} A-I_q=0}\end{array}\right.
+\end{aligned}
+\end{equation}
+
+解方程：
+
+\begin{equation}
+\begin{aligned}
+(X-ZA^T) A=0 & \Rightarrow Z=XA \\
+X^Z-AZ^TZ+AL=0 & \Rightarrow A^TX^Z-A^TAZ^TZ+A^TAL=0\\
+& \quad L=Z^Z-A^TX^Z\\
+& \Rightarrow X^TXA=AA^TX^TXA
+\end{aligned}
+\end{equation}
+
+对$A^TX^T X A$可以做特征值分解写成$S\Lambda S^T$，$X^T X A=AS\LambdaS^T$，$X^T X A S=A S\Lambda$，$AS$是特征向量，$\Lambda$是特征值。
+
+回到开始的问题$\underset {Z,A}{min} \varphi (A,Z)$，设$Z=XA$，
+
+\begin{equation}
+\begin{aligned}
+min \phi & = min tr((X-XA^T)(X-XA^T)^T)\\
+& = min tr(X(I-AA^T)X^T)\\
+& = min tr(XX^T)-tr(XAA^TX^T)\\
+& = ...-tr(A^TX^TXA)\\
+& = ...-tr(\Lambda)\\
+& = tr(XX^T)-tr(\Lambda)\\
+\end{aligned}
+\end{equation}
+
+则$\Lambda$为$XX^T$的最大前q个特征值才能让$\phi$最小，AS是对应的特征向量。
+
+
+\section{Neural Network}
+\subsection{Six Keys}
+神经网络的基本思想是想要找一个$F(x)$来逼近函数$f(x)$，用复合形式来找：$F=F_L(F_{L-1}...())$。其中有六个关键：
+
+1. Key Compound Operation 
+
+2. Key Chain Rule 
+
+3. Key Architecture (CNN/RNN)
+
+4. Key Algorithm (SGD)
+
+5. Key Subroutine (Back-Propagation to execute the channel)
+
+6. Key Nonlinear (ReLU)
 
 
 
